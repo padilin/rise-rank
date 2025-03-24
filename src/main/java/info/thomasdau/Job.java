@@ -16,7 +16,7 @@ public class Job {
     public void updateProgress(Character character) {
         // Example intelligence causes exp rate
         progress += progressRate * character.getIntelligence();
-        if (progress >= 100) {
+        if (progress >= 3) {
             levelUp();
         }
     }
