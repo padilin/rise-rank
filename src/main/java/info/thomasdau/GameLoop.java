@@ -27,10 +27,10 @@ public class GameLoop implements QuarkusApplication {
         
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::updateGame, 1, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::renderGame, 1, 1, TimeUnit.SECONDS);
 
         while (gameRunning) {
             Thread.sleep(1000);
-            renderGame();
             tickCount++;
 
             // Example

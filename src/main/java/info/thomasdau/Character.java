@@ -15,6 +15,8 @@ public class Character {
     private int gold;
     private List<Item> items;
     private List<Skill> skills;
+    // Stage 2
+    private Manager manager;
 
     public Character(String name) {
         this.name = name;
@@ -27,6 +29,13 @@ public class Character {
         this.gold = 0;
         this.items = new ArrayList<>();
         this.skills = new ArrayList<>();
+    }
+
+    public void transitionToManager() {
+        manager = new Manager(name + "'s Team", 0.5);
+        manager.addWorker(new Worker("zezima", 1.0));
+        manager.addWorker(new Worker("worker2", 1.2));
+        System.out.println(name + "is now a manager!");
     }
 
     public void applyItemBonuses() {
@@ -71,5 +80,7 @@ public class Character {
 
     public List<Skill> getSkills() { return skills; }
     public void addSkill(Skill skill) { this.skills.add(skill); }
+
+    public Manager getManager() { return manager; }
 
 }
