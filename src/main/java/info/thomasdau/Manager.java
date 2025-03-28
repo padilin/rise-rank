@@ -3,33 +3,56 @@ package info.thomasdau;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Manager {
-    private String name;
-    private List<Worker> workers;
-    private double teamProgress;
-    private double teamProgressRate;
+public class Manager extends Progression {
+    private List<Character> team;
+    private List<Manager> leaders;
 
-    public Manager(String name, double teamProgressRate) {
-        this.name = name;
-        this.workers = new ArrayList<>();
-        this.teamProgress = 0;
-        this.teamProgressRate = teamProgressRate;
+    public Manager(String name, double progressRate) {
+        super(name, progressRate);
+        this.team = new ArrayList<>();
+        this.leaders = new ArrayList<>();
     }
 
-    public void addWorker(Worker worker) {
-        workers.add(worker);
+    public void hireWorker(Character worker) {
+        team.add(worker);
+        System.out.println(worker.getName() + " hired!");
     }
 
-    public void updateTeamProgress(Character character) {
-        teamProgress += teamProgressRate * character.getIntelligence();
-        System.out.println("Team progress: " + teamProgress);
+    public void fireWorker(Character worker) {
+        team.remove(worker);
+        System.out.println(worker.getName() + " fired!");
     }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void hireLeader(Manager manager) {
+        leaders.add(manager);
+        System.out.println("Leader " + manager.getName() + " hired!");
+    }
 
-    public List<Worker> getWorkers() { return workers; }
+    public void fireLeader(Manager manager) {
+        leaders.remove(manager);
+        System.out.println("Leader " + manager.getName() + " fired!");
+    }
 
-    public double getTeamProgress() { return teamProgress; }
-    public void setTeamProgress(double teamProgress) { this.teamProgress = teamProgress; }
+    public void upgradeTeam(double upgradeRate) {
+        progressRate += upgradeRate;
+        System.out.println("Team upgraded! Progress rate: " + progressRate); 
+    }
+
+    @Override
+    public double getProficency(Character character) {
+        double totalEfficiency = 0;
+        if (team != null) {
+            for (Character worker : team) {
+                totalEfficiency += worker.getIntelligence();
+            }
+        }
+        if (leaders != null) {
+            for (Manager leader : leaders) {
+                totalEfficiency += leader.getProficency(character);
+            }
+        }
+        return (totalEfficiency + character.getIntelligence()) * progressRate;
+    }
+
+    public List<Character> getTeam() { return team; }
 }

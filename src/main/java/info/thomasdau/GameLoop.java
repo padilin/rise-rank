@@ -6,49 +6,48 @@ import io.quarkus.runtime.annotations.QuarkusMain;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @QuarkusMain
 public class GameLoop implements QuarkusApplication {
     private Character character;
-    private Job job;
-    private ScheduledExecutorService scheduler;
     private boolean gameRunning = true;
     private Random random = new Random();
     private int tickCount = 0;
 
     @Override
-    public int run(String... args) throws Exception{
-        System.out.println("Game started!");
+    public int run(String... args) throws Exception {
         character = new Character("Hero");
-        character.addItem(new Item("Basic Pickaxe", "A simple pickaxe", 1, 0, 0, 10));
-        character.applyItemBonuses();
-        job = new Job("Miner", 0.1);
-        
-        scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(this::updateGame, 1, 1, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(this::renderGame, 1, 1, TimeUnit.SECONDS);
+        character.startJob();
+        System.out.println("Game started!");
 
         while (gameRunning) {
             Thread.sleep(1000);
+            updateGame();
+            renderGame();
             tickCount++;
 
-            // Example
-            if (job.getLevel() >= 2 ) {
-                gameRunning = false;
-                System.out.println("Game ended: Job Level reached 2.");
-            }
-        }
 
-        scheduler.shutdown();
+            
+            if (character.getJob().getLevel() >= 3 && character.getManager() == null && character.getStage() == 1) {
+                character.transitionToManager();
+            }
+
+            if (character.getStage() == 2 && character.getManager().getLevel() >= 10) {
+                    character.transitionToOwner();
+                }
+
+            if (character.getStage() == 3 && character.getOwner().getLevel() >= 10) {
+                System.out.println("You Win! You hit level 10 and maxed out the current content!");
+                gameRunning = false;
+            }
+
+        }
         return 0;
     }
 
     private void updateGame() {
-        System.out.println("Job progress: " + job.getProgress());
-
         if (tickCount % 2 == 0 && random.nextDouble() < 0.8) {
-            job.updateProgress(character);
+            character.updateProgress();
         }
     }
 

@@ -15,8 +15,13 @@ public class Character {
     private int gold;
     private List<Item> items;
     private List<Skill> skills;
+    private int stage;
+    // Stage 1
+    private Job job;
     // Stage 2
     private Manager manager;
+    // Stage 3
+    private Owner owner;
 
     public Character(String name) {
         this.name = name;
@@ -29,13 +34,45 @@ public class Character {
         this.gold = 0;
         this.items = new ArrayList<>();
         this.skills = new ArrayList<>();
+        this.stage = 1;
+    }
+
+    public void startJob() {
+        this.addItem(new Item("Basic Pickaxe", "A simple pickaxe", 1, 0, 0, 10));
+        this.applyItemBonuses();
+        job = new Job("Miner", 0.1);
+        this.addJob(job);
     }
 
     public void transitionToManager() {
         manager = new Manager(name + "'s Team", 0.5);
-        manager.addWorker(new Worker("zezima", 1.0));
-        manager.addWorker(new Worker("worker2", 1.2));
+        Character zezima = new Character("zezima");
+        zezima.setIntelligence(2);
+        manager.hireWorker(zezima);
+        manager.hireWorker(new Character("worker2"));
+        stage = 2;
         System.out.println(name + "is now a manager!");
+    }
+
+    public void transitionToOwner() {
+        owner = new Owner(name + "'s Empire", 0.3);
+        System.out.println(owner.getName() + " is now an owner!");
+        stage = 3;
+
+        Company company1 = new Company("Company A", 1.0);
+        Manager genericManager = new Manager("generic joe", 1.1);
+        Manager genericManagerSenior = new Manager("generic older joe", 1.2);
+        Character genericWorker = new Character("Bo");
+        genericManagerSenior.hireLeader(genericManager);
+        genericManager.hireWorker(genericWorker);
+
+        owner.addCompany(company1);
+        company1.hireManager(genericManagerSenior);
+
+        Company company2 = new Company("Company B", 1.0);
+        company2.hireManager(genericManager);
+
+        owner.addCompany(company2);
     }
 
     public void applyItemBonuses() {
@@ -47,6 +84,18 @@ public class Character {
             strength += item.getStrengthBonus();
             intelligence += item.getIntelligenceBonus();
             agility += item.getAgilityBonus();
+        }
+    }
+
+    public void updateProgress() {
+        if (stage == 1) {
+            job.updateProgress(this);
+        }
+        if (stage == 2) {
+            manager.updateProgress(this);
+        }
+        if (stage == 3 ){
+            owner.updateProgress(this);
         }
     }
 
@@ -81,6 +130,13 @@ public class Character {
     public List<Skill> getSkills() { return skills; }
     public void addSkill(Skill skill) { this.skills.add(skill); }
 
+    public int getStage() { return stage; }
+
+    public Job getJob() { return this.job; }
+    public void addJob(Job job) { this.job = job; }
+
     public Manager getManager() { return manager; }
+
+    public Owner getOwner() { return owner; }
 
 }
